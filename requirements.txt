@@ -1,0 +1,28 @@
+fastapi[standard]==0.128.6
+sqlmodel==0.0.33
+sqlalchemy==2.0.46
+PyJWT==2.11.0
+pwdlib[argon2]==0.3.0
+websockets==16.1
+firebase-admin>=6.4.0
+
+# Сервер и деплой (обязательно)
+gunicorn==23.0.0               # Production WSGI/ASGI сервер
+uvicorn[standard]>=0.34.0      # ASGI сервер
+
+# Переменные окружения и настройки
+python-dotenv==1.0.1           # Загрузка .env файлов
+pydantic-settings==2.6.0       # Управление настройками через Pydantic
+
+# База данных (дополнительно к вашим)
+alembic==1.14.1                # Миграции SQLAlchemy
+# asyncpg==0.30.0                # Драйвер PostgreSQL
+
+# HTTP клиент для внешних запросов
+httpx==0.28.1                  # Асинхронный HTTP клиент
+
+# Логирование
+python-json-logger==2.0.7      # Структурированные логи в JSON
+
+# Middleware и утилиты
+cryptography==46.0.1           # Для PyJWT
