@@ -1,0 +1,30 @@
+when:
+  - event: [manual]
+    branch: master
+
+steps:
+  build-and-push:
+    image: docker:27-cli
+    environment:
+      DOCKER_HOST: tcp://host.docker.internal:2375
+      # секреты придут из настроек Woodpecker (см. ниже)
+      DOCKER_USERNAME:
+        from_secret: docker_username
+      DOCKER_PASSWORD:
+        from_secret: docker_password
+    commands:
+      # 1. логин в Docker Hub
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+      # 2. тег: короткий SHA коммита + latest
+      - SHORT_SHA=$(echo "$CI_COMMIT_SHA" | cut -c1-8)
+      - IMAGE_NAME="$DOCKER_USERNAME/open-texting-server"
+      - IMAGE_TAG="$IMAGE_NAME:$SHORT_SHA"
+      - IMAGE_LATEST="$IMAGE_NAME:latest"
+
+      # 3. сборка
+      - docker build -t "$IMAGE_TAG" -t "$IMAGE_LATEST" .
+
+      # 4. пуш
+      - docker push "$IMAGE_TAG"
+      - docker push "$IMAGE_LATEST"

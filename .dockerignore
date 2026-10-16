@@ -1,0 +1,39 @@
+# CI/CD
+.woodpecker/
+.woodpecker
+.github/
+.gitlab-ci.yml
+Jenkinsfile
+
+# Git
+.git/
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+
+# Docs & misc
+*.md
+README*
+LICENSE
+.env
+.env.*
