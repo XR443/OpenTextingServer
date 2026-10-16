@@ -4,14 +4,12 @@ import os
 from typing import Optional, List
 from uuid import UUID
 
+import firebase_admin
+# Импорты для FCM
+from firebase_admin import messaging, credentials
 from starlette.websockets import WebSocket, WebSocketDisconnect
-from sqlmodel import Session, select
 
 from model import User
-
-# Импорты для FCM
-from firebase_admin import messaging, initialize_app, credentials
-import firebase_admin
 
 logger = logging.getLogger(__name__)
 
@@ -127,7 +125,7 @@ class FCMService:
                         )
                     ),
                     fcm_options=messaging.APNSFCMOptions(
-                        image= None
+                        image=None
                     )
                 ),
             )
@@ -223,35 +221,32 @@ class ConnectionManager:
             logger.info(f"WebSocket not connected for {recipient_id}, trying FCM")
 
         # 2. Если вебсокет недоступен, отправляем через FCM
-        if not ws_success:
-            if not fcm_tokens:
-                logger.warning(f"No FCM tokens found for user {recipient_id}")
-                return False
+        if not fcm_tokens:
+            logger.warning(f"No FCM tokens found for user {recipient_id}")
+            return False
 
-            # Подготовка данных для FCM
-            sender_name = author.username or "Пользователь"
-            fcm_data = {
-                "sender_id": author_id,
-                "sender_name": sender_name,
-                "type": "message",
-                "message": message or "",
-                **(data or {})
-            }
+        # Подготовка данных для FCM
+        sender_name = author.username or "Пользователь"
+        fcm_data = {
+            "sender_id": author_id,
+            "sender_name": sender_name,
+            "type": "message",
+            "message": message or "",
+            **(data or {})
+        }
 
-            # Отправка на все устройства
-            fcm_success = False
-            for token in fcm_tokens:
-                success = await self.fcm_service.send_notification(
-                    account_id=recipient_uuid,
-                    fcm_token=token,
-                    title=sender_name,
-                    body=message or "У вас новое сообщение",
-                    data=fcm_data
-                )
+        # Отправка на все устройства
+        fcm_success = False
+        for token in fcm_tokens:
+            success = await self.fcm_service.send_notification(
+                account_id=recipient_uuid,
+                fcm_token=token,
+                title=sender_name,
+                body=message or "У вас новое сообщение",
+                data=fcm_data
+            )
 
-            return fcm_success
-
-        return True
+        return fcm_success
 
     async def send_notify_with_fallback(
             self,
